@@ -1,0 +1,84 @@
+<!-- juego/templates/juego/home.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inicio - Millonario</title>
+  <style>
+    body {
+      background: #02071f;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #10194a;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      width: 350px;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin: 10px 0 5px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 10px;
+    }
+    button {
+      background: #1e88e5;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+    .error {
+      color: #ff5252;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>¿Quién quiere ser millonario?</h1>
+    <p>Ingresa tus datos para comenzar el juego</p>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <label for="name">Nombre:</label>
+      <input type="text" id="name" name="name">
+
+      <label for="document">Documento:</label>
+      <input type="text" id="document" name="document">
+
+      <button type="submit">Jugar</button>
+    </form>
+
+    <a href="{% url 'ranking' %}">Ver ranking</a>
+  </div>
+</body>
+</html>

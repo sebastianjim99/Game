@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego - Millonario</title>
+  <style>
+    body {
+      background: #02071f;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .top-bar .player {
+      font-size: 14px;
+    }
+    .top-bar .status {
+      text-align: right;
+    }
+    .layout {
+      display: flex;
+      gap: 20px;
+    }
+    .left-col {
+      flex: 2;
+    }
+    .right-col {
+      flex: 1;
+    }
+    .pregunta {
+      background: #1e2a78;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .pregunta h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+    .pregunta p {
+      margin: 0;
+    }
+    .opciones {
+      margin-bottom: 20px;
+    }
+    .opcion-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      background: #1e88e5;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .opcion-btn:hover:not(:disabled) {
+      background: #1565c0;
+    }
+    .opcion-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .ayudas, .escalera {
+      background: #10194a;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .ayudas h3, .escalera h3 {
+      margin-top: 0;
+      font-size: 15px;
+    }
+    .ayudas form {
+      margin: 5px 0;
+    }
+    .ayuda-btn {
+      width: 100%;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      background: #1e88e5;
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .ayuda-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .ayuda-btn:hover:not(:disabled) {
+      background: #1565c0;
+    }
+    .escalera-item {
+      padding: 3px 5px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .escalera-item.actual {
+      background: #ffab00;
+      color: #000;
+      font-weight: bold;
+    }
+    .escalera-item span {
+      display: inline-block;
+      min-width: 40px;
+    }
+    .mensaje-ayuda {
+      background: #263238;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .footer-links a {
+      color: #90caf9;
+      text-decoration: none;
+      margin-right: 15px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <div class="player">
+        <strong>Jugador:</strong> {{ attempt.name }} ({{ attempt.document }})
+      </div>
+      <div class="status">
+        <div><strong>Pregunta:</strong> {{ attempt.current_question_number }} de {{ total_preguntas }}</div>
+        <div><strong>Premio actual:</strong> ${{ attempt.current_prize }}</div>
+        <div><strong>Jugando por:</strong> ${{ premio_nivel }}</div>
+      </div>
+    </div>
+
+    {% if mensaje_info %}
+      <div class="mensaje-ayuda">
+        {{ mensaje_info }}
+      </div>
+    {% endif %}
+
+    <div class="layout">
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="left-col">
+        <div class="pregunta">
+          <h2>Pregunta {{ attempt.current_question_number }}</h2>
+          <p>{{ question.text }}</p>
+        </div>
+
+        <div class="opciones">
+          <form method="post" action="{% url 'responder' %}">
+            {% csrf_token %}
+
+            {% with "A" as letra %}
+              <button class="opcion-btn"
+                      type="submit"
+                      name="option"
+                      value="A"
+                      {% if letra in disabled_letters %}disabled{% endif %}>
+                A) {{ question.option_a }}
+              </button>
+            {% endwith %}
+
+            {% with "B" as letra %}
+              <button class="opcion-btn"
+                      type="submit"
+                      name="option"
+                      value="B"
+                      {% if letra in disabled_letters %}disabled{% endif %}>
+                B) {{ question.option_b }}
+              </button>
+            {% endwith %}
+
+            {% with "C" as letra %}
+              <button class="opcion-btn"
+                      type="submit"
+                      name="option"
+                      value="C"
+                      {% if letra in disabled_letters %}disabled{% endif %}>
+                C) {{ question.option_c }}
+              </button>
+            {% endwith %}
+
+            {% with "D" as letra %}
+              <button class="opcion-btn"
+                      type="submit"
+                      name="option"
+                      value="D"
+                      {% if letra in disabled_letters %}disabled{% endif %}>
+                D) {{ question.option_d }}
+              </button>
+            {% endwith %}
+          </form>
+        </div>
+
+        <!-- Info de ayudas públicas/amigo -->
+        {% if ayuda_publico_data %}
+          <div class="mensaje-ayuda">
+            <strong>Resultado del público:</strong><br>
+            A) {{ ayuda_publico_data.0 }}%<br>
+            B) {{ ayuda_publico_data.1 }}%<br>
+            C) {{ ayuda_publico_data.2 }}%<br>
+            D) {{ ayuda_publico_data.3 }}%
+          </div>
+        {% endif %}
+
+        {% if ayuda_amigo_letra %}
+          <div class="mensaje-ayuda">
+            <strong>Tu amigo dice:</strong>
+            Creo que la respuesta correcta es {{ ayuda_amigo_letra }}).
+          </div>
+        {% endif %}
+
+        <div class="footer-links">
+          <a href="{% url 'home' %}">Salir y volver al inicio</a>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA -->
+      <div class="right-col">
+        <div class="ayudas">
+          <h3>Ayudas</h3>
+
+          <form method="post" action="{% url 'ayuda_5050' %}">
+            {% csrf_token %}
+            <button class="ayuda-btn" type="submit" {% if attempt.used_5050 %}disabled{% endif %}>
+              50 : 50
+            </button>
+          </form>
+
+          <form method="post" action="{% url 'ayuda_publico' %}">
+            {% csrf_token %}
+            <button class="ayuda-btn" type="submit" {% if attempt.used_public %}disabled{% endif %}>
+              Preguntar al público
+            </button>
+          </form>
+
+          <form method="post" action="{% url 'ayuda_amigo' %}">
+            {% csrf_token %}
+            <button class="ayuda-btn" type="submit" {% if attempt.used_friend %}disabled{% endif %}>
+              Llamar a un amigo
+            </button>
+          </form>
+
+          <form method="post" action="{% url 'ayuda_cambiar' %}">
+            {% csrf_token %}
+            <button class="ayuda-btn" type="submit" {% if attempt.used_switch %}disabled{% endif %}>
+              Cambiar de pregunta
+            </button>
+          </form>
+        </div>
+
+        <div class="escalera">
+          <h3>Escalera de premios</h3>
+          {% for nivel in escalera %}
+            <div class="escalera-item {% if nivel.es_actual %}actual{% endif %}">
+              <span>{{ nivel.numero }}.</span> ${{ nivel.premio }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

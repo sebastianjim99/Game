@@ -1,0 +1,53 @@
+<!-- juego/templates/juego/resultado.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultado - Millonario</title>
+  <style>
+    body {
+      background: #02071f;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .card {
+      background: #10194a;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      text-align: center;
+      width: 400px;
+    }
+    h2 { margin-top: 0; }
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 8px 15px;
+      background: #1e88e5;
+      color: #fff;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Resultado del intento</h2>
+    <p><strong>Jugador:</strong> {{ attempt.name }} ({{ attempt.document }})</p>
+    <p><strong>Llegaste hasta la pregunta:</strong> {{ attempt.max_reached_question }}</p>
+    <p><strong>Premio obtenido:</strong> ${{ attempt.current_prize }}</p>
+    <p><strong>Estado:</strong> {{ attempt.get_finished_reason_display }}</p>
+
+    <a class="btn" href="{% url 'home' %}">Volver a jugar</a>
+  </div>
+</body>
+</html>

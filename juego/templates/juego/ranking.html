@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ranking - Millonario</title>
+  <style>
+    body {
+      background: #02071f;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #b0bec5;
+      font-size: 14px;
+    }
+
+    /* PODIO */
+    .podium-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 40px;
+      align-items: flex-end;
+    }
+    .podium-card {
+      background: #10194a;
+      border-radius: 10px 10px 0 0;
+      padding: 10px;
+      text-align: center;
+      width: 180px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .podium-card .position {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .podium-card .name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .podium-card .document {
+      font-size: 12px;
+      color: #b0bec5;
+      margin-bottom: 8px;
+    }
+    .podium-card .info {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .podium-base {
+      margin-top: 10px;
+      padding: 4px 0;
+      border-radius: 6px 6px 0 0;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    /* alturas distintas según el puesto */
+    .first {
+      height: 220px;
+      background: linear-gradient(to top, #ffd54f, #ffb300);
+    }
+    .second {
+      height: 180px;
+      background: linear-gradient(to top, #cfd8dc, #b0bec5);
+    }
+    .third {
+      height: 160px;
+      background: linear-gradient(to top, #ffab91, #ff8a65);
+    }
+
+    .podium-card-inner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+      background: rgba(2, 7, 31, 0.92);
+    }
+
+    .tag-medal {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+    .gold   { background: #ffeb3b; color: #000; }
+    .silver { background: #cfd8dc; color: #000; }
+    .bronze { background: #ffb74d; color: #000; }
+
+    /* TABLA RESTO */
+    .table-wrapper {
+      background: #10194a;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead {
+      background: #1e2a78;
+    }
+    th, td {
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      font-weight: bold;
+    }
+    tbody tr:nth-child(odd) {
+      background: rgba(255,255,255,0.02);
+    }
+    tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.05);
+    }
+    tbody tr:hover {
+      background: rgba(144, 202, 249, 0.2);
+    }
+    .empty-msg {
+      text-align: center;
+      padding: 15px 0;
+      color: #b0bec5;
+    }
+
+    .back-link {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .back-link a {
+      color: #90caf9;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ranking de jugadores</h1>
+    <div class="subtitle">
+      Top 3 en podio y el resto de jugadores ordenados por pregunta alcanzada y premio.
+    </div>
+
+    <!-- PODIO -->
+    {% if top3 %}
+      <div class="podium-wrapper">
+        {# 2° lugar #}
+        {% if top3|length > 1 %}
+          {% with player=top3.1 %}
+          <div class="podium-card second">
+            <div class="podium-card-inner">
+              <div class="tag-medal silver">2° Lugar</div>
+              <div class="name">{{ player.name }}</div>
+              <div class="document">{{ player.document }}</div>
+              <div class="info">
+                Pregunta alcanzada: {{ player.max_reached_question }}<br>
+                Premio: ${{ player.current_prize }}<br>
+                Estado: {{ player.get_finished_reason_display }}<br>
+              </div>
+              <div class="podium-base">2°</div>
+            </div>
+          </div>
+          {% endwith %}
+        {% endif %}
+
+        {# 1° lugar #}
+        {% with player=top3.0 %}
+        <div class="podium-card first">
+          <div class="podium-card-inner">
+            <div class="tag-medal gold">1° Lugar</div>
+            <div class="name">{{ player.name }}</div>
+            <div class="document">{{ player.document }}</div>
+            <div class="info">
+              Pregunta alcanzada: {{ player.max_reached_question }}<br>
+              Premio: ${{ player.current_prize }}<br>
+              Estado: {{ player.get_finished_reason_display }}<br>
+            </div>
+            <div class="podium-base">1°</div>
+          </div>
+        </div>
+        {% endwith %}
+
+        {# 3° lugar #}
+        {% if top3|length > 2 %}
+          {% with player=top3.2 %}
+          <div class="podium-card third">
+            <div class="podium-card-inner">
+              <div class="tag-medal bronze">3° Lugar</div>
+              <div class="name">{{ player.name }}</div>
+              <div class="document">{{ player.document }}</div>
+              <div class="info">
+                Pregunta alcanzada: {{ player.max_reached_question }}<br>
+                Premio: ${{ player.current_prize }}<br>
+                Estado: {{ player.get_finished_reason_display }}<br>
+              </div>
+              <div class="podium-base">3°</div>
+            </div>
+          </div>
+          {% endwith %}
+        {% endif %}
+      </div>
+    {% else %}
+      <p class="empty-msg">Todavía no hay partidas finalizadas para mostrar en el ranking.</p>
+    {% endif %}
+
+    <!-- TABLA RESTO -->
+    {% if others %}
+      <div class="table-wrapper">
+        <h3>Otros jugadores destacados</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Documento</th>
+              <th>Pregunta alcanzada</th>
+              <th>Premio</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in others %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ a.name }}</td>
+                <td>{{ a.document }}</td>
+                <td>{{ a.max_reached_question }}</td>
+                <td>${{ a.current_prize }}</td>
+                <td>{{ a.get_finished_reason_display }}</td>
+                <td>{{ a.created_at|date:"Y-m-d H:i" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+    <div class="back-link">
+      <a href="{% url 'home' %}">⬅ Volver al inicio del juego</a>
+    </div>
+  </div>
+</body>
+</html>
