@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=-68e)_(43bi=9nzr9wr3yl*vov7ez@s&#wsvx3ynt=hh*tm-6'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -77,11 +81,11 @@ WSGI_APPLICATION = 'millonario_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'juego',          # tu base de datos
-        'USER': 'root',           # tu usuario MySQL
-        'PASSWORD': '',           # tu contraseña MySQL
-        'HOST': '127.0.0.1',      # o 'localhost'
-        'PORT': '3306',           # puerto por defecto
+        'NAME': os.getenv("DB_NAME"),          # tu base de datos
+        'USER': os.getenv("DB_USER"),          # tu usuario MySQL
+        'PASSWORD': os.getenv("DB_PASSWORD"), # tu contraseña MySQL
+        'HOST': os.getenv("DB_HOST", "127.0.0.1"),      # o 'localhost'
+        'PORT': os.getenv("DB_PORT", "3306"),           # puerto por defecto
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },

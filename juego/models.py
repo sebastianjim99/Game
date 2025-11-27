@@ -82,3 +82,22 @@ class GameAttempt(models.Model):
             return Difficulty.MEDIUM
         else:
             return Difficulty.HARD
+        
+class AttemptQuestion(models.Model):
+    attempt = models.ForeignKey(
+        GameAttempt,
+        on_delete=models.CASCADE,
+        related_name="attempt_questions"
+    )
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE
+    )
+    question_number = models.PositiveIntegerField()  # número de la pregunta en el juego (1,2,3,...)
+    asked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('attempt', 'question')  # la misma pregunta no se repite en el mismo intento
+
+    def __str__(self):
+        return f"Intento {self.attempt_id} - Pregunta #{self.question_number}: {self.question_id}"
